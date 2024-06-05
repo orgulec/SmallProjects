@@ -1,4 +1,4 @@
-package knight_game;
+package knight_game.game_data;
 
 import lombok.Getter;
 

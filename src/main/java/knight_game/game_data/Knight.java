@@ -1,4 +1,4 @@
-package knight_game;
+package knight_game.game_data;
 
 import lombok.Data;
 
@@ -6,15 +6,16 @@ import java.util.Random;
 
 @Data
 public class Knight {
-    private long id;
     private String name;
     private int strength;
     private int agility;
     private int endurance;
     private int speed;
+
     private int maxHp = 100;
     private volatile int hp = 100;
     private int gold = 800;
+
     private Equipment weapon;
     private Equipment armour;
     private int wins = 0;
@@ -25,8 +26,7 @@ public class Knight {
     public Knight() {
     }
 
-    public Knight(long id, String name, int strength, int agility, int endurance, int speed) {
-        this.id = id;
+    public Knight(String name, int strength, int agility, int endurance, int speed) {
         this.name = name;
         this.strength = strength;
         this.agility = agility;
@@ -88,7 +88,7 @@ public class Knight {
 
     @Override
     public String toString() {
-        return " " + id + " - " + name +
+        return name +
                 " [Strength: " + strength +
                 ", Endurance: " + endurance +
                 ", Agility: " + agility +

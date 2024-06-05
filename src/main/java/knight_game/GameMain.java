@@ -1,4 +1,9 @@
-package own_exercises.knight_game;
+package knight_game;
+
+import knight_game.game_data.Equipment;
+import knight_game.game_data.GameUtil;
+import knight_game.game_data.Generator;
+import knight_game.game_data.Knight;
 
 import java.util.List;
 import java.util.Random;
@@ -25,12 +30,12 @@ public class GameMain {
             System.out.println(startText);
             if (PLAYER == null) {
                 System.out.println("Choose your warrior:");
-                knightsList.forEach(System.out::println);
+                knightsList.forEach(a -> System.out.println("  " + knightsList.indexOf(a) + " - " + a.toString()));
 
-                int first = new Scanner(System.in).nextInt();
+                int input = new Scanner(System.in).nextInt();
 
-                if (first < knightsList.size()) {
-                    PLAYER = knightsList.get(first);
+                if (input < knightsList.size()) {
+                    PLAYER = knightsList.get(input);
                     System.out.println("You choose " + PLAYER.getName() + "!");
                 } else {
                     System.out.println("Wrong choose...");
@@ -75,7 +80,7 @@ public class GameMain {
                     battleExecutor.shutdown();
                 }
             }
-            battleExecutor.awaitTermination(2000, TimeUnit.MILLISECONDS);
+            battleExecutor.awaitTermination(2, TimeUnit.SECONDS);
 
             if (!GAME) {
                 if (!battleExecutor.isTerminated()) battleExecutor.shutdownNow();
@@ -104,23 +109,25 @@ public class GameMain {
         }
     }
 
-    private static void buyArmourForPlayer(List<Equipment> armour) {
+    private static void buyArmourForPlayer(List<Equipment> armours) {
         System.out.println("\nYou still have " + PLAYER.getGold() + " gold coins. You can buy some armour:");
         if (PLAYER.getArmour() != null) System.out.println("(Now you have " + PLAYER.getArmour().getName() + ")");
-        armour.forEach(a -> System.out.println("  " + armour.indexOf(a) + " - " + a.toString()));
+        armours.forEach(a -> System.out.println("  " + armours.indexOf(a) + " - " + a.toString()));
         System.out.println("Press X to skip...");
-        String input2 = new Scanner(System.in).nextLine();
+        String input = new Scanner(System.in).nextLine();
 
-        if (!input2.equalsIgnoreCase("x")) {
-            int buy2 = Integer.parseInt(input2);
-            if (buy2 < armour.size()) {
-                Equipment eq2 = armour.get(buy2);
-                if (PLAYER.getGold() >= eq2.getPrice()) {
-                    PLAYER.setArmour(eq2);
-                    PLAYER.setGold(PLAYER.getGold() - eq2.getPrice());
-                    System.out.println("Now you have " + eq2.getName() + "!");
-                } else {
+        if (!input.equalsIgnoreCase("x") && input.matches("[0-9]")) {
+            int buy = Integer.parseInt(input);
+            if (buy < armours.size()) {
+                Equipment armour = armours.get(buy);
+                if(PLAYER.getArmour()!=null && PLAYER.getArmour().equals(armour)){
+                    System.out.println("You already have it!");
+                } else if (PLAYER.getGold() < armour.getPrice()) {
                     System.out.println("You have not enough gold coins!");
+                } else {
+                    PLAYER.setArmour(armour);
+                    PLAYER.setGold(PLAYER.getGold() - armour.getPrice());
+                    System.out.println("Now you have " + armour.getName() + "!");
                 }
             }
         }
@@ -133,16 +140,18 @@ public class GameMain {
         System.out.println("Press X to skip...");
         String input = new Scanner(System.in).nextLine();
 
-        if (!input.equalsIgnoreCase("x")) {
+        if (!input.equalsIgnoreCase("x") && input.matches("[0-9]")) {
             int buy = Integer.parseInt(input);
             if (buy < weapons.size()) {
-                Equipment eq1 = weapons.get(buy);
-                if (PLAYER.getGold() >= eq1.getPrice()) {
-                    PLAYER.setWeapon(eq1);
-                    PLAYER.setGold(PLAYER.getGold() - eq1.getPrice());
-                    System.out.println("Now you have " + eq1.getName() + "!");
-                } else {
+                Equipment weapon = weapons.get(buy);
+                if(PLAYER.getWeapon()!=null && PLAYER.getWeapon().equals(weapon)){
+                    System.out.println("You already have it!");
+                } else if (PLAYER.getGold() < weapon.getPrice()) {
                     System.out.println("You don't have enough gold coins!");
+                } else {
+                    PLAYER.setWeapon(weapon);
+                    PLAYER.setGold(PLAYER.getGold() - weapon.getPrice());
+                    System.out.println("Now you have " + weapon.getName() + "!");
                 }
             }
         }
@@ -152,9 +161,9 @@ public class GameMain {
         String result = "";
         if (player.getHp() > 0 && enemy.getHp() > 0) {
             if (player.tryToHit(enemy)) {
-                long plAttack = player.makeAttack() / enemy.defence();
-                result += showPlayerState(player) + " is attacking " + showPlayerState(enemy) + " and cosing him " + plAttack + " damage!";
-                int enemyHpLeft = (int) (enemy.getHp() - plAttack);
+                long playerAttack = player.makeAttack() / enemy.defence();
+                result += showPlayerState(player) + " is attacking " + showPlayerState(enemy) + " and cosing him " + playerAttack + " damage!";
+                int enemyHpLeft = (int) (enemy.getHp() - playerAttack);
                 enemy.setHp(enemyHpLeft);
 
                 if (enemy.getHp() <= 0) {
@@ -165,7 +174,7 @@ public class GameMain {
                     GAME = false;
                 }
             } else {
-                result += showPlayerState(player) + " is trying to attack " + showPlayerState(enemy) + " but he cannot hit the enemy!";
+                result += showPlayerState(player) + " is trying to attack " + showPlayerState(enemy) + " but he can't hit the enemy!";
             }
         } else {
             GAME = false;
@@ -177,11 +186,11 @@ public class GameMain {
     private static void setGainsAfterFight() {
         int factor = PLAYER.isWinner() ? 2 : 1;
         int goldGain = new Random().nextInt(100) + 50 * factor;
-        int exp = new Random().nextInt(50) + 75 * factor;
-        System.out.println("\nYou gain " + goldGain + " gold coins and " + exp + " Exp!");
+        int expGain = new Random().nextInt(50) + 75 * factor;
+        System.out.println("\nYou gain " + goldGain + " gold coins and " + expGain + " Exp!");
         PLAYER.setGold(PLAYER.getGold() + goldGain);
+        PLAYER.gainLevel(expGain);
         PLAYER.setHp(100);
-        PLAYER.gainLevel(exp);
         PLAYER.setWinner(false);
     }
 

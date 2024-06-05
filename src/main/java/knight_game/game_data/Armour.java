@@ -1,9 +1,9 @@
-package knight_game;
+package knight_game.game_data;
 
 import lombok.Getter;
 
 @Getter
-public class Armour extends Equipment {
+class Armour extends Equipment {
     private String name;
     private int power;
     private int minusSpeed;
@@ -12,11 +12,11 @@ public class Armour extends Equipment {
 
     public Armour(String name, int power, int minusSpeed, int price) {
         super(name, power, minusSpeed, price);
-        this.name=name;
-        this.power=power;
-        this.minusSpeed=minusSpeed;
+        this.name = name;
+        this.power = power;
+        this.minusSpeed = minusSpeed;
         this.price = price;
-        this.type="armour";
+        this.type = "armour";
     }
 
     @Override

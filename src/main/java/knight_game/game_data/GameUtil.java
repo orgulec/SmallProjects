@@ -1,9 +1,11 @@
-package knight_game;
+package knight_game.game_data;
+
+import knight_game.GameMain;
 
 public class GameUtil implements Runnable{
     private Knight player;
     private Knight enemy;
-    long delay;
+    private long delay;
 
     public GameUtil(Knight player, Knight enemy) {
         this.player = player;
